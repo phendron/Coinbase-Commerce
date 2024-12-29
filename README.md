@@ -6,7 +6,7 @@ This test suite is designed to fake the Charge API service webhook responses fro
 ## Getting Started
 
 ```
-main.py host=localhost port=8001 protocol=http webhook_host=localhost webhook_port=9001 transaction=TRANSACTION
+main.py host=localhost port=8001 protocol=http webhook_host=localhost webhook_port=9001 transaction=TRANSACTION api_key=e72a4f87-f039-4aa6-ae3d-05b3487b0fcb webhook_shared_secret=e72a4f87-f039-4aa6-ae3d-05b3487b0fcb
 ```
 The above command outlines the default arguments and parameters for the **main.py** script it is the same as
 executing the script without any arguments.
@@ -24,6 +24,10 @@ executing the script without any arguments.
 
 * **webhook_host** - Specifies the address that webhooks are received [you domain]/[webhook pathway]
 * **webhook_port** - Specifies the port that webhooks are received [you domain]:[webhook port]/[webhook_pathway]
+
+### Credentials
+* **api_key** - Specifies the X-CC-Api-Key packet header value
+* **webhook_shared_secret** - Specifies the shared secret key for webhook packet validation
 
 
 ### Transaction
