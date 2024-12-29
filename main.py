@@ -18,11 +18,12 @@ PORT = 8002
 
 class handler(http.server.BaseHTTPRequestHandler):
 
-    def __init__(self, host="localhost", port=443, relay_type="TRANSACTION", shared_secret=None):
+    def __init__(self, host="localhost", port=443, relay_type="TRANSACTION", api_key=None, shared_secret=None):
         self.relay_type = relay_type
         self.webhook_host = host
         self.webhook_port = port
         self.webhook_url = self.webhook_host+":"+str(self.webhook_port)
+        self.cc_api_key = api_key
         self.cc_webhook_shared_secret = shared_secret
 
         # super().__init__() must be called at the end
@@ -45,7 +46,7 @@ class handler(http.server.BaseHTTPRequestHandler):
         path = self.path.split("/")
         if path[1] == "charges":
             Cb = Coinbase()
-
+            Cb.apiKey(self.cc_api_key)
             if len(path) > 2:
                 Cb.getCharge(path[2])
             else:
@@ -72,6 +73,7 @@ class handler(http.server.BaseHTTPRequestHandler):
 
         if self.path == "/charges":
             Cb = Coinbase()
+            Cb.apiKey(self.cc_api_key)
             if "local_price" in data:
                 if "amount" in data["local_price"] and "currency" in data["local_price"]:
                     Cb.local_price(data["local_price"]["amount"], data["local_price"]["currency"])
@@ -87,6 +89,7 @@ class handler(http.server.BaseHTTPRequestHandler):
         else:
 
             Cb = Coinbase()
+            Cb.apiKey(self.cc_api_key)
             path = self.path.split("/")
 
             if path[1] == "charges" and path[3] == "cancel":
@@ -180,7 +183,7 @@ class handler(http.server.BaseHTTPRequestHandler):
 
 def compileArgs():
 
-    args = {"host": "localhost", "port": 8002, "protocol":"http", "webhook_host":"localhost", "webhook_port":9001, "transaction":"transaction", "webhook_shared_secret":"e72a4f87-f039-4aa6-ae3d-05b3487b0fcb"}
+    args = {"host": "localhost", "port": 8002, "protocol":"http", "webhook_host":"localhost", "webhook_port":9001, "transaction":"transaction", "api_key":"e72a4f87-f039-4aa6-ae3d-05b3487b0fcb", "webhook_shared_secret":"e72a4f87-f039-4aa6-ae3d-05b3487b0fcb"}
 
     for i in range(0, len(sys.argv)):
         arg = sys.argv[i]
@@ -194,7 +197,7 @@ def compileArgs():
     return args
 
 cli_args = compileArgs()
-server_handler = handler(cli_args['webhook_host'], cli_args['webhook_port'], cli_args['transaction'], cli_args['webhook_shared_secret'])
+server_handler = handler(cli_args['webhook_host'], cli_args['webhook_port'], cli_args['transaction'], cli_args['api_key'], cli_args['webhook_shared_secret'])
 with socketserver.TCPServer((cli_args['host'], cli_args['port']), server_handler) as httpd:
     print("serving on port", cli_args['host']+":"+str(cli_args['port']))
     print("webhook url: ", cli_args['webhook_host']+":"+str(cli_args['webhook_port']))
